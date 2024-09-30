@@ -1,0 +1,24 @@
+{
+  "name": "stv-voting-platform",
+  "version": "1.0.0",
+  "description": "Plataforma de votação STV (Voto Único Transferível) com segurança aprimorada usando provas de conhecimento zero (zk-SNARKs).",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha --exit",
+    "compilecircom": "circom .circuit/circuit.circom --r1cs --wasm --sym -o .circuit",
+    "setupgroth16": "snarkjs groth16 setup .circuit/circuit.r1cs .circuit/circuit_final.zkey",
+    "generate-proof": "node .scripts/generateProof.js",
+    "deploy": "hardhat run scripts/deploy.js",
+    "verify": "hardhat verify --network mainnet"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/seuprojeto/stv-voting-platform.git"
+  },
+  "keywords": [
+    "stv",
+    "voting",
+    "zk-snarks",
+    "solidity"
+  ]
+}
