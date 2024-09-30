@@ -1,0 +1,48 @@
+name: STV Voting Platform CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+        # Verificar compatibilidade com versões de Node.js suportadas
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Usar Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+
+    # Verificar a existência do arquivo de lock antes de instalar dependências
+    - name: Verificar arquivo de lock
+      run: |
+        if [ ! -f package-lock.json ] && [ ! -f npm-shrinkwrap.json ] && [ ! -f yarn.lock ]; then
+          echo "Nenhum arquivo de lock encontrado. Abortando."
+          exit 1
+        fi
+
+    - name: Instalar dependências
+      run: npm install  # Usar npm install ao invés de npm ci quando não há arquivo de lock
+
+    - name: Compilar circuito ZK
+      run: node scripts/compileCircuit.js  # Script para compilar circuitos ZK [[2]](https://poe.com/citation?message_id=259724163071&citation=2)[[4]](https://poe.com/citation?message_id=259724163071&citation=4)
+
+    - name: Gerar zk-proof de exemplo
+      run: node scripts/generateProof.js   # Script para gerar provas zk [[5]](https://poe.com/citation?message_id=259724163071&citation=5)
+
+    - name: Rodar testes
+      run: npm test  # Executa os testes unitários e de integração [[3]](https://poe.com/citation?message_id=259724163071&citation=3)
+
+    - name: Build do projeto (se necessário)
+      run: npm run build --if-present
